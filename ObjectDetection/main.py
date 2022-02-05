@@ -21,7 +21,12 @@ cv2.createTrackbar('Smax', 'Track', 255, 255, track);
 cv2.createTrackbar('Vmin', 'Track', 0, 255, track);
 cv2.createTrackbar('Vmax', 'Track', 255, 255, track);
 
-cap = cv2.VideoCapture(0)
+
+# for webcam
+# cap = cv2.VideoCapture(0)
+
+# for usb-camera (PS3)
+cap = cv2.VideoCapture(1)
 
 while True:
     #webcam
