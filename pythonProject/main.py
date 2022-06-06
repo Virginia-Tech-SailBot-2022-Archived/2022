@@ -1,35 +1,45 @@
-from sailIO import Sensors
+import struct
+import serial
 
 
-#ser = serial.Serial('COM15', 115200)
+ser = serial.Serial('COM15', 115200)
 #ser2: serial
 
-#ser2 = serial.Serial('COM14', 4800)
-
+#ser2 = serial.Serial('COM8', 4800)
 
 def getGPSData():
-    sensors = Sensors('COM14')
-    print(sensors.getGPS())
-    """
+    #sensors = Sensors('COM14')
+    #print(sensors.getGPS())
+
     while True:
         str = ser2.readline().decode('utf-8')
         if str.startswith("$GPGGA"):
             strs = str.split(",")
-            print(strs)
-        ser2.flushInput()
-"""
-"""
-def getTFminiData():
-    ser.write(struct.pack('>BBBB', 0x5A, 0x04, 0x04, 0x62))
+            if(strs[2] == ''):
+                print("0")
+            else:
+                print(strs[2], strs[4])
 
+        ser2.flushInput()
+
+
+
+
+
+
+def getTFminiData():
+    #ser.write(struct.pack('>BBBB', 0x5A, 0x04, 0x04, 0x62))
+    """
     while True:
         counta = ser.inWaiting()
         if counta >= 9:
             break
 
-    print(ser.read(9).hex())
+    recv = ser.read(9)
+    #print(ser.read(9).hex())
+    print(int(recv[2]) + int(recv[3]) * 256)
     ser.flushInput()
-
+"""
     while True:
         count = ser.inWaiting()
         if count > 8:
@@ -37,7 +47,7 @@ def getTFminiData():
             ser.flushInput()
             if recv[0] == 0x59 and recv[1] == 0x59:  # 0x59 is 'Y'
 
-                print(recv.hex())
+                #print(recv.hex())
                 low = int(recv[2])
                 high = int(recv[3])
 
@@ -45,18 +55,19 @@ def getTFminiData():
                 print(distance)
 
 
-            """
+
 
 
 if __name__ == '__main__':
-    getGPSData()
-    """
+    getTFminiData()
+"""
     try:
-        if ser2.is_open == False:
-            ser2.open()
-        getGPSData()
-        #getTFminiData()
+        if ser.is_open == False:
+            ser.open()
+        #getGPSData()
+        getTFminiData()
+
     except KeyboardInterrupt:   # Ctrl+C
-        if ser2 != None:
-            ser2.close()
+        if ser != None:
+            ser.close()
             """

@@ -35,36 +35,47 @@ class Sensors:
             line = self.sergps.readline().decode('utf-8')
             if line.startswith("$GPGGA"):
                 break
-            self.sergps.flushInput()
 
         strs = line.split(",")
 
         if strs[6] == '0':
             return 0
 
-        coord = {"LAT": strs[2], "LONG": strs[4]}
-        return coord
-"""
-    def getLIDAR(self):
-        self.serlidar.write(struct.pack('>BBBB', 0x5A, 0x04, 0x04, 0x62))
-        while True:
-            counta = self.serlidar.inWaiting()
-            if counta >= 9:
-                break
+        latdeg = int(strs[2][0:2])
+        latmin = float(strs[2][2:])
 
-        arr = self.serlidar.read(9).hex()
-        print(self.serlidar.read(9).hex())
-        dist = arr[2] + arr[3] * 256
-        self.serlidar.flushInput()
-        return dist
-"""
+        longdeg = int(strs[4][0:2])
+        longmin = float(strs[4][2:])
+
+
+
+        coord = {"LAT": latdeg*60 + latmin, "LONG": longdeg*60 + longmin}
+        return coord
+
     def getWindData(self):
-        """ Returns Wind Direction (with respect to Boat) and Wind Speed (Knots)"""
+        """ Returns Wind Direction (with respect to Boat) """
+        line: str
+        while True:
+            line = self.serairmar.readline().decode('utf-8')
+            if line.startswith("$WIMWV"):
+                strs = line.split(",")
+
+                if strs[2] == "R":
+                    return float(strs[1])
+
     def getHeading(self):
         """ Returns Current Heading with respect to North """
+        line: str
+        while True:
+            line = self.serairmar.readline().decode('utf-8')
+            if line.startswith("$HCHDT"):
+                strs = line.split(",")
 
-    def
-        
+                if strs[2] == "T":
+                    return float(strs[1])
+
+
+
 class Motors:
     """
     Arduino Motor Controls
@@ -83,14 +94,16 @@ class Motors:
         :param degree: mast motor degree: between 0 and 180
 
         """
-        self.serardu.write('')
+        str = "M" + str(degree)
+        self.serardu.write(str)
 
     def moveRudder(self, degree):
         """
         Moving Rudder motor
         :param degree: rudder motor degree: between 0 and 180
         """
-        self.serardu.write('')
+        str = "R" + str(degree)
+        self.serardu.write(str)
 
 class Servos:
     def __init__(self):
