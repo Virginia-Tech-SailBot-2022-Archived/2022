@@ -1,0 +1,83 @@
+import math
+import time
+
+import pyproj
+curr_pos = []
+wind_dir = []
+dest = []
+bearing =[]
+
+def calc_bearing(pointA, pointB) ->float:
+    global bearing
+    geodesic = pyproj.Geod(ellps='WGS84')
+    fwd_azimuth, back_azimuth, distance = geodesic.inv(pointA[1], pointA[0], pointB[1], pointB[0])
+    bearing = -back_azimuth
+    return -back_azimuth
+
+
+#print(calc_bearing([42.2764166667,71.7569722222],[42.2762222222, 71.7566944444]))
+
+def read():
+    global curr_pos
+    global wind_dir
+    curr_pos = sensor.getGPS()
+    #curr_pos = {"LAT":float(getGPS()["LAT"), "LONG":float(getGPS()["LONG"])}
+    #wind_dir = 280
+    wind_dir = sensor.getWindData()["Angle"]
+    #^expected to be an angle w.r.t. north
+    heading = sensor.getHeading()
+    #^expected to be an angle w.r.t. north
+    print('')
+
+
+
+motor = Motors()
+sensor = Sensors()
+def go_there():
+    rudder_const = 45
+    global dest
+    global tack_flag
+    global wind_dir
+    '''
+    if (abs(dest-wind_dir) <= 30):
+        if (tack_flag is False):
+            dest = wind_dir - 30
+            motor.moveMast(84.6)
+        else:
+            dest = wind_dir + 30
+            motor.moveMast(95.4)
+        print('tacking')
+    else:
+    '''
+    wind_dir = wind_dir - 180
+    #moveMast(wind_dir + 180 - aoa)
+    #aoa is angle of attack
+    degree_curr = (curr_pos["LAT"] / 60, curr_pos["LONG"] / 60)
+    degree_dest = (dest["LAT"]/60, dest["LONG"]/60)
+    bearing = calc_bearing(degree_curr, degree_dest)
+    angle_of_trail = -1
+    if wind_dir < 2*math.pi:
+        angle_of_trail = 0.5*(wind_dir) + 90
+    else:
+        angle_of_trail = 0.5*(wind_dir-180) + 180
+    if (bearing < -5):
+        motor.moveRudder(0+rudder_const)
+        print('')
+    elif (bearing > 5):
+        motor.moveRudder(180 - rudder_const)
+        print('')
+    else:
+        motor.moveRudder(90)
+        print('')
+    motor.moveMast(180 - angle_of_trail)
+
+while True:
+    time.sleep(1)
+    print('wind',sensor.getWindData)
+    print(sensor.getWindData)
+    print('heading',sensor.getHeading)
+    dest = {"LAT":2536.6, "LONG":4305.42}
+    print('we are headed to',dest)
+    print('our bearing to the destination is',bearing)
+    go_there()
+    x = input('go again?')
