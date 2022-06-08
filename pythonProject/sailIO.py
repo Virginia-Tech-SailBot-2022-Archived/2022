@@ -73,6 +73,17 @@ class Sensors:
 
                 if strs[2] == "T":
                     return float(strs[1])
+                
+                
+    def getTrueWindData(self):
+        """ Returns Wind Direction and Speed with respect to True North """
+        line: str
+        while True:
+            line = self.serairmar.readline().decode('utf-8')
+            if line.startswith("$WIMWD"):
+                strs = line.split(",")
+                if(strs[2] == "T"):
+                    return {"Angle": float(strs[1]), "Speed": float(strs[5])}
 
 
 
